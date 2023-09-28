@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import styles from "./Map.module.css";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 //IMPORTING FROM LEAFLET.
@@ -16,11 +16,26 @@ import {
 //IMPORTING CONTEXT DATA.
 import { useCities } from "../contexts/CitiesContext";
 
-export default function Map() {
-  const [searchParams] = useSearchParams();
-  const mapLat = searchParams.get("lat");
-  const mapLng = searchParams.get("lng");
+//IMPORTING CUSTOM HOOKS.
+import { useGeoLocation } from "../customHooks/useGeoLocation";
+import { useUrlPosition } from "../customHooks/useUrlPosition";
 
+//IMPORTING COMPONENTS.
+import Button from "./Button";
+
+export default function Map() {
+  //Fetching data from customHooks.
+  //Fetching GeoLocation data from useGeoLocation CustomHook.
+  const {
+    isLoading: isLoadingPosition,
+    position: geolocationPosition,
+    getPosition,
+  } = useGeoLocation();
+
+  //Fetching Positions from useUrlPosition CustomHook.
+  const [mapLat, mapLng] = useUrlPosition();
+
+  //Fetching data from contextAPI.
   const { cities } = useCities();
   const [mapPosition, setMapPosition] = useState([40, 0]);
 
@@ -32,13 +47,22 @@ export default function Map() {
     [mapLat, mapLng]
   );
 
+  //Updating the mapPosition to GeoLocation API data.
+  useEffect(
+    function () {
+      if (geolocationPosition)
+        setMapPosition([geolocationPosition.lat, geolocationPosition.lng]);
+    },
+    [geolocationPosition]
+  );
+
   return (
-    <div
-      className={styles.mapContainer}
-      // onClick={() => {
-      //   navigate("form");
-      // }}
-    >
+    <div className={styles.mapContainer}>
+      {!geolocationPosition && (
+        <Button type="position" onClick={getPosition}>
+          {isLoadingPosition ? "Loading..." : "Use your Position"}
+        </Button>
+      )}
       <MapContainer
         // center={[mapLat || 40, mapLng || 0]}
         center={mapPosition}

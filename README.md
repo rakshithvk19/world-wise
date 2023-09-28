@@ -7,10 +7,18 @@ Currently, two official plugins are available:
 - [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
 - [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
+# TO-DO
+
+1. Convert storing data from API to local storage.
+2. On clicking back button in the add cities form, it should navigate/render to city list.
+3. Fix the flags emoji picture.
+
 # Libraries used to build the project.
 
 1. Leaflet library - to show the Map.
 2. GeoLocation API - fetch the lat and lng from the Map.
+3. Reverse GeoCoding API from api.bigdatacloud.net.
+4. React-datepicker for the react date picker component.
 
 # Things learnt while building the Project.
 
