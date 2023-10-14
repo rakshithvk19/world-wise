@@ -1,16 +1,47 @@
 import styles from "./Login.module.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+//IMPORTING COMPONENTS.
 import PageNav from "../components/PageNav";
+import Button from "../components/Button";
+
+//IMPORTING CONTEXT.
+import { useAuth } from "../contexts/AuthenticationContext";
 
 export default function Login() {
   // PRE-FILL FOR DEV PURPOSES
-  const [email, setEmail] = useState("jack@example.com");
-  const [password, setPassword] = useState("qwerty");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  //Fetch functions defined in the context.
+  const { login, isAuthenticated } = useAuth();
+
+  //Fetching navigate function.
+  const navigate = useNavigate();
+
+  //React hook to synchronise authentication from the remote server.
+  useEffect(
+    function () {
+      if (isAuthenticated) {
+        navigate("/app", { replace: true });
+      }
+    },
+    [isAuthenticated, navigate]
+  );
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    if (email && password) {
+      login(email, password);
+    }
+  }
 
   return (
     <main className={styles.login}>
       <PageNav />
-      <form className={styles.form}>
+      <form className={styles.form} onSubmit={handleSubmit}>
         <div className={styles.row}>
           <label htmlFor="email">Email address</label>
           <input
@@ -18,6 +49,7 @@ export default function Login() {
             id="email"
             onChange={(e) => setEmail(e.target.value)}
             value={email}
+            // value={"test@test.com"}
           />
         </div>
 
@@ -28,11 +60,13 @@ export default function Login() {
             id="password"
             onChange={(e) => setPassword(e.target.value)}
             value={password}
+            // value={"test"}
           />
         </div>
 
         <div>
-          <button>Login</button>
+          {/* <button>Login</button> */}
+          <Button type="primary">Login</Button>
         </div>
       </form>
     </main>

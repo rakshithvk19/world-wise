@@ -1,6 +1,12 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react/prop-types */
-import { createContext, useEffect, useContext, useReducer } from "react";
+import {
+  createContext,
+  useEffect,
+  useContext,
+  useReducer,
+  useCallback,
+} from "react";
 
 const CitiesContext = createContext();
 
@@ -81,27 +87,30 @@ function CitiesProvider({ children }) {
   }, []);
 
   //Function to fetch the current city from the API using the ID.
-  async function getCity(id) {
-    //Check if city is already saved on the server.
-    if (Number(id) === currentCity.id) return;
+  const getCity = useCallback(
+    async function getCity(id) {
+      //Check if city is already saved on the server.
+      if (Number(id) === currentCity.id) return;
 
-    dispatch({ type: "loading" });
-    try {
-      const res = await fetch(`${BASE_URL}/cities/${id}`);
-      if (!res.ok) {
-        throw new Error("Something went wrong, Please try after sometime!");
+      dispatch({ type: "loading" });
+      try {
+        const res = await fetch(`${BASE_URL}/cities/${id}`);
+        if (!res.ok) {
+          throw new Error("Something went wrong, Please try after sometime!");
+        }
+
+        const data = await res.json();
+        if (!data) {
+          throw new Error("Alert loading the data. Please try again!");
+        }
+
+        dispatch({ type: "city/loaded", payload: data });
+      } catch (e) {
+        dispatch({ type: "rejected", payload: e.message });
       }
-
-      const data = await res.json();
-      if (!data) {
-        throw new Error("Alert loading the data. Please try again!");
-      }
-
-      dispatch({ type: "city/loaded", payload: data });
-    } catch (e) {
-      dispatch({ type: "rejected", payload: e.message });
-    }
-  }
+    },
+    [currentCity.id]
+  );
 
   //Function to set the city data to the API.
   async function createCity(newCity) {

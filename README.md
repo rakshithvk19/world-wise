@@ -20,6 +20,10 @@ Currently, two official plugins are available:
 3. Reverse GeoCoding API from api.bigdatacloud.net.
 4. React-datepicker for the react date picker component.
 
+# Features
+
+1. Authentication functionality.
+
 # Things learnt while building the Project.
 
 1. React Router
