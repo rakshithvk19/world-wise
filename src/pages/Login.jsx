@@ -15,7 +15,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
 
   //Fetch functions defined in the context.
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, message } = useAuth();
 
   //Fetching navigate function.
   const navigate = useNavigate();
@@ -64,9 +64,9 @@ export default function Login() {
           />
         </div>
 
-        <div>
-          {/* <button>Login</button> */}
+        <div className={styles.buttonRow}>
           <Button type="primary">Login</Button>
+          <h4 className={styles.message}>{message}</h4>
         </div>
       </form>
     </main>

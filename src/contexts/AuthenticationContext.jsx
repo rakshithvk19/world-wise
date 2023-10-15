@@ -9,6 +9,7 @@ const AuthContext = createContext();
 const initialState = {
   user: null,
   isAuthenticated: false,
+  message: "Enter username and password",
 };
 
 function reducer(state, action) {
@@ -18,6 +19,7 @@ function reducer(state, action) {
         ...state,
         isAuthenticated: true,
         user: action.payload,
+        message: "Login successful.",
       };
 
     case "logout":
@@ -25,6 +27,15 @@ function reducer(state, action) {
         ...state,
         isAuthenticated: false,
         user: null,
+        message: "Enter username and password.",
+      };
+
+    case "wrongCredentials":
+      return {
+        ...state,
+        isAuthenticated: false,
+        user: null,
+        message: "The username and password combination entered is incorrect!",
       };
     default:
       throw new Error("Unexpected Error");
@@ -41,7 +52,7 @@ const FAKE_USER = {
 
 //Function that returns the context provider.
 function AuthProvider({ children }) {
-  const [{ user, isAuthenticated }, dispatch] = useReducer(
+  const [{ user, isAuthenticated, message }, dispatch] = useReducer(
     reducer,
     initialState
   );
@@ -51,6 +62,10 @@ function AuthProvider({ children }) {
     if (email === FAKE_USER.email && password == FAKE_USER.password) {
       dispatch({ type: "login", payload: FAKE_USER });
     }
+
+    if (email !== FAKE_USER.email || password != FAKE_USER.password) {
+      dispatch({ type: "wrongCredentials" });
+    }
   }
 
   //Function to logout.
@@ -59,7 +74,9 @@ function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, message, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );

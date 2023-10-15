@@ -24,3 +24,17 @@
   flex-direction: column;
   gap: 0.5rem;
 }
+
+.buttonRow {
+  display: flex;
+  flex-direction: row;
+  column-gap: 20px;
+  align-items: center;
+}
+
+.message {
+  margin: 0px;
+  padding: 10px;
+  size: 20px;
+  color: rgba(250, 235, 215, 0.988);
+}
