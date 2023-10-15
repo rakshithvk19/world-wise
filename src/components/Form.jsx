@@ -19,14 +19,34 @@ import Button from "./Button";
 import BackButton from "./BackButton";
 import Message from "./Message";
 import Spinner from "./Spinner";
+import CountryEmoji from "./CountryEmoji";
 
-export function convertToEmoji(countryCode) {
-  // Function to convert a country code to an emoji flag.
-  const codePoints = countryCode
-    .toUpperCase()
-    .split("")
-    .map((char) => 127397 + char.charCodeAt());
-  return String.fromCodePoint(...codePoints);
+// export function convertToEmoji(countryCode) {
+//   // Function to convert a country code to an emoji flag.
+//   return (
+//     <CountryFlag
+//       countryCode={countryCode} // Specify the 2-letter country code (ISO 3166-1 alpha-2)
+//       svg
+//       style={{
+//         width: "30px",
+//         height: "auto",
+//       }}
+//     />
+//   );
+// }
+
+//Function to generate random 10-digit ID.
+function generateRandomId() {
+  let id = "";
+  const characters = "0123456789";
+  const charactersLength = characters.length;
+
+  for (let i = 0; i < 10; i++) {
+    const randomIndex = Math.floor(Math.random() * charactersLength);
+    id += characters[randomIndex];
+  }
+
+  return id;
 }
 
 const BASE_URL = `https://api.bigdatacloud.net/data/reverse-geocode-client`;
@@ -36,7 +56,7 @@ export default function Form() {
   const [country, setCountry] = useState("");
   const [date, setDate] = useState(new Date());
   const [notes, setNotes] = useState("");
-  const [emoji, setEmoji] = useState("");
+  const [countryCode, setCountryCode] = useState("");
   const [geoCodingError, setIsGeoCodingError] = useState("");
 
   const [isLoadingGeocoding, setIsLoadingGeocoding] = useState(false);
@@ -80,8 +100,8 @@ export default function Form() {
             );
 
           setCityName(data.city || data.locality || "");
-          setCountry(data.country || "");
-          setEmoji(convertToEmoji(data.countryCode));
+          setCountry(data.countryName || "");
+          setCountryCode(data.countryCode);
         } catch (err) {
           setIsGeoCodingError(err.message);
         } finally {
@@ -96,19 +116,23 @@ export default function Form() {
   //Handling the submit button on saving the form.
   async function handleSubmit(e) {
     e.preventDefault();
+    const randomID = generateRandomId();
 
     //If no city-name or date input to the form return immediately.
     if (!cityName || !date) return;
 
     //Create a new random ID if you are saving the city data using LocalStorage API
     const newCity = {
+      id: randomID,
       cityName,
       country,
-      emoji,
+      countryCode,
       date,
       notes,
       position: { lat, lng },
     };
+
+    // console.log(newCity);
 
     //Calling the method from Context API.
     await createCity(newCity, isLoading);
@@ -133,7 +157,9 @@ export default function Form() {
           onChange={(e) => setCityName(e.target.value)}
           value={cityName}
         />
-        <span className={styles.flag}>{emoji}</span>
+        <span className={styles.flag}>
+          <CountryEmoji countryCode={countryCode} />
+        </span>
       </div>
 
       <div className={styles.row}>

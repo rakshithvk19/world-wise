@@ -5,6 +5,7 @@ import styles from "./City.module.css";
 // import ButtonBack from "./ButtonBack";
 import Spinner from "./Spinner";
 import BackButton from "./BackButton";
+import CountryEmoji from "./CountryEmoji";
 
 //IMPORTING CONTEXT.
 import { useCities } from "../contexts/CitiesContext";
@@ -32,7 +33,7 @@ function City() {
     [id, getCity]
   );
 
-  const { cityName, emoji, date, notes } = currentCity;
+  const { cityName, countryCode, date, notes } = currentCity;
 
   if (isLoading) return <Spinner />;
 
@@ -42,7 +43,10 @@ function City() {
         <h6>City name</h6>
 
         <h3>
-          <span>{emoji}</span> {cityName}
+          <span>
+            <CountryEmoji countryCode={countryCode} />
+          </span>
+          {cityName}
         </h3>
       </div>
 

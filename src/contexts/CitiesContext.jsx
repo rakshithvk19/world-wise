@@ -10,17 +10,15 @@ import {
 
 const CitiesContext = createContext();
 
-const BASE_URL = "http://localhost:8000";
-
-//Initial state for useReducer function.
+// Initial state for useReducer function.
 const initialState = {
-  cities: [],
+  cities: JSON.parse(localStorage.getItem("cities")) || [],
   isLoading: false,
   currentCity: {},
   error: "",
 };
 
-//Reducer function to
+// Reducer function
 function Reducer(state, action) {
   switch (action.type) {
     case "loading":
@@ -62,89 +60,35 @@ function CitiesProvider({ children }) {
     initialState
   );
 
-  useEffect(function () {
-    //Function to fetch cities array from the API.
-    async function fetchCities() {
-      dispatch({ type: "loading" });
-      try {
-        //Fetching data from API.
-        const res = await fetch(`${BASE_URL}/cities`);
-        if (!res.ok) {
-          throw new Error("Somthing went wrong. Please try after sometime!");
-        }
+  //To synchronize data from local storage and react states.
+  //Check if the reducer function dispatch methods are working properly.
+  useEffect(() => {
+    localStorage.setItem("cities", JSON.stringify(cities));
+  }, [cities]);
 
-        const data = await res.json();
-        if (!data) {
-          throw new Error("Alert loading the data. Please try again!");
-        }
-
-        dispatch({ type: "cities/loaded", payload: data });
-      } catch (e) {
-        dispatch({ type: "rejected", payload: e.message });
-      }
-    }
-    fetchCities();
-  }, []);
-
-  //Function to fetch the current city from the API using the ID.
+  // Function to fetch the current city from local storage using the ID.
   const getCity = useCallback(
-    async function getCity(id) {
-      //Check if city is already saved on the server.
-      if (Number(id) === currentCity.id) return;
+    function getCity(id) {
+      // Check if city is already saved in state.
+      const city = cities.find((city) => city.id === id);
 
-      dispatch({ type: "loading" });
-      try {
-        const res = await fetch(`${BASE_URL}/cities/${id}`);
-        if (!res.ok) {
-          throw new Error("Something went wrong, Please try after sometime!");
-        }
-
-        const data = await res.json();
-        if (!data) {
-          throw new Error("Alert loading the data. Please try again!");
-        }
-
-        dispatch({ type: "city/loaded", payload: data });
-      } catch (e) {
-        dispatch({ type: "rejected", payload: e.message });
+      if (city) {
+        dispatch({ type: "city/loaded", payload: city });
+      } else {
+        dispatch({ type: "rejected", payload: "City not found" });
       }
     },
-    [currentCity.id]
+    [cities]
   );
 
-  //Function to set the city data to the API.
-  async function createCity(newCity) {
-    dispatch({ type: "loading" });
-    try {
-      const res = await fetch(`${BASE_URL}/cities`, {
-        method: "POST",
-        body: JSON.stringify(newCity),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const data = await res.json();
-      dispatch({ type: "cities/created", payload: data });
-    } catch (e) {
-      dispatch({ type: "rejected", payload: e.message });
-    }
+  // Function to set the city data to local storage.
+  function createCity(newCity) {
+    dispatch({ type: "cities/created", payload: newCity });
   }
 
-  //Function to delete the city data.
-  async function deleteCity(id) {
-    dispatch({ type: "loading" });
-    try {
-      await fetch(`${BASE_URL}/cities/${id}`, {
-        method: "DELETE",
-      });
-
-      dispatch({ type: "city/deleted", payload: id });
-
-      // setCities((cities) => cities.filter((city) => city.id !== id));
-    } catch (e) {
-      dispatch({ type: "rejected", payload: e.message });
-    }
+  // Function to delete the city data from local storage.
+  function deleteCity(id) {
+    dispatch({ type: "city/deleted", payload: id });
   }
 
   return (

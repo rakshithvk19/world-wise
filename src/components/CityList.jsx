@@ -23,6 +23,7 @@ export default function CityList() {
   return (
     <ul className={styles.CityList}>
       {cities.map((city) => (
+        // console.log(city)
         <CityItem city={city} key={city.id} />
       ))}
     </ul>
